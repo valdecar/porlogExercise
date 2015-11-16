@@ -74,12 +74,11 @@ b(K,[Xk|ListTail],ListOut):-
 %find [c_1,..,c_n|c_1+..+c_n=X]
 %K going throut dimention List
 %T up value of some element List[i]
-%init K=0,T=1,List=[0,0,0]
+%init K=0,T=1,List = [0,...,0]
 s(X,List,K,T):-
 	%c_1+..+c_n=X
 	sum_list(List,S),
 	S=X,
-	%permutation(List,ListPerm),
 	b(1,List,ListBinoms),
 	print(ListBinoms).
 %change c_1,..,c_n one by one.
