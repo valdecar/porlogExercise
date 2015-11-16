@@ -33,7 +33,9 @@ changeElemOfListAtN(ElemNumber,N,ListOld,ListNew):-
 	nth0(ElemNumber,ListOld,ElemOldValue,ListTmp),
 	ElemNewValue is ElemOldValue+N,
 	nth0(ElemNumber,ListNew,ElemNewValue,ListTmp).
-
+%use like
+%?-factorial(5,N).
+%N=120
 factorial(0,N):-
 	N=1.
 factorial(K,N):-
@@ -41,6 +43,9 @@ factorial(K,N):-
 	K1 is K-1,
 	factorial(K1,N1),
 	N is N1*K.
+%use like
+%binom(10,2,B).
+%B=45
 binom(N,K,B):-
 	N>=K,
 	factorial(N,N1),
@@ -49,60 +54,69 @@ binom(N,K,B):-
 	factorial(K,K1),
 	B is N1/(NK1*K1).
 %init T=1
-%%find Ck: binom(Ck,K,Xk)
-bb(Ck,K,Xk,T):-
+%find Ck: binom(Ck,K,Xk)
+%use like
+%?-inverseBinom(Ck,2,45,1).
+%Ck = 10
+inverseBinom(Ck,K,Xk,T):-
 	T=<Xk,
 	binom(T,K,B),
 	B=Xk,
 	Ck is T.
-bb(Ck,K,Xk,T):-
+inverseBinom(Ck,K,Xk,T):-
 	T=<Xk,
 	T1 is T+1,
-	bb(Ck,K,Xk,T1).
+	inverseBinom(Ck,K,Xk,T1).
+
 %find  C1,...,Ck : binom(C1,1)=X1,...,binom(Ck,k)=Xk
 %init K=1
-b(K,[],ListOut):-
+%use like
+%seqBinoms(1,[6,45],L).
+%L=[6,10]
+seqBinoms(K,[],ListOut):-
 	append([],[],ListOut).
-b(K,[Xk|ListTail],ListOut):-
-	%length([Ck|ListTail],N),
-	%K=<N,
-	bb(Ck,K,Xk,1),%find Ck: binom(Ck,K,Xk)
+seqBinoms(K,[Xk|ListTail],ListOut):-
+	inverseBinom(Ck,K,Xk,1),%find Ck: binom(Ck,K,Xk)
 	K1 is K+1,
-	b(K1,ListTail,ListOut1),
-	append([Ck],ListOut1,ListOut).
+	seqBinoms(K1,ListTail,ListOut1),
+	append([Ck],ListOut1,ListOut).%ListOut=ListOut1.append(Ck)
 
-%find [c_1,..,c_n|c_1+..+c_n=X]
+%find [c_1,..,c_n|binom(c_1,1)+..+binom(c_n,n)=X]
 %K going throut dimention List
 %T up value of some element List[i]
 %init K=0,T=1,List=[0,0,0]
-s(X,List,K,T):-
+%use like
+%?-binomNumericalSystem(15,[0,0],0,1).
+%[9,4]
+%meens that 15=binom(9,1)+binom(9,2)
+binomNumericalSystem(X,List,K,T):-
 	%c_1+..+c_n=X
 	sum_list(List,S),
 	S=X,
 	%permutation(List,ListPerm),
-	b(1,List,ListBinoms),
+	seqBinoms(1,List,ListBinoms),
 	print(ListBinoms).
 %change c_1,..,c_n one by one.
-s(X,List,K,T):-
+binomNumericalSystem(X,List,K,T):-
 	sum_list(List,S),
 	S<X,
 	length(List,N),
 	K<N,
 	changeElemOfListAt1(K,List,NewList),
 	Knew is K+1,
-	s(X,NewList,Knew,T);
+	binomNumericalSystem(X,NewList,Knew,T);
 	sum_list(List,S),
 	S<X,
 	length(List,N),
 	%second round
 	K>=N,
 	Knew is 0,
-	s(X,List,Knew,T).
+	binomNumericalSystem(X,List,Knew,T).
 %change T and up c_K at T
-s(X,List,K,T):-
+binomNumericalSystem(X,List,K,T):-
 	T=<X,
 	sum_list(List,S),
 	S<X,
 	changeElemOfListAtN(K,T,List,NewList),
 	Tnew is T+1,
-	s(X,NewList,K,T).
+	binomNumericalSystem(X,NewList,K,T).
